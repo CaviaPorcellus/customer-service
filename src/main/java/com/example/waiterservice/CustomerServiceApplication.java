@@ -1,4 +1,4 @@
-package com.example.customerservice;
+package com.example.waiterservice;
 
 import org.springframework.boot.Banner;
 import org.springframework.boot.WebApplicationType;

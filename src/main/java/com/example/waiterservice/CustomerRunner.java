@@ -1,17 +1,17 @@
-package com.example.customerservice;
+package com.example.waiterservice;
 
-import com.example.customerservice.model.Coffee;
-import com.example.customerservice.model.CoffeeOrder;
-import com.example.customerservice.model.OrderRequest;
+import com.example.waiterservice.model.Coffee;
+import com.example.waiterservice.model.CoffeeOrder;
+import com.example.waiterservice.model.OrderRequest;
+import com.example.waiterservice.swagger_client.api.CoffeeControllerApi;
+import com.example.waiterservice.swagger_client.api.CoffeeOrderControllerApi;
+import com.example.waiterservice.swagger_client.invoker.ApiClient;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -30,14 +30,43 @@ public class CustomerRunner implements ApplicationRunner {
   @Autowired
   RestTemplate restTemplate;
 
+  @Autowired
+  ApiClient apiClient;
+  @Autowired
+  CoffeeControllerApi coffeerApi;
+  @Autowired
+  CoffeeOrderControllerApi orderApi;
+
   @Override
   public void run(ApplicationArguments args) throws Exception {
+    apiClient.setBasePath("http://localhost:8080");
     readMenu();
     Long orderId = orderCoffee();
     queryOrder(orderId);
   }
 
   private void readMenu() {
+    List<Coffee> coffees = coffeerApi.getAllUsingGET();
+    coffees.forEach(cc -> log.info("Coffee: {}", cc));
+  }
+
+  private long orderCoffee() {
+    OrderRequest orderRequest = OrderRequest
+        .builder()
+        .customer("Kevin Jin")
+        .coffeeNames(Arrays.asList("latte", "mocha"))
+        .build();
+    CoffeeOrder order = orderApi.createOrderUsingPOST(orderRequest);
+    log.info("Coffee order id: {}", order.getId());
+    return order.getId();
+  }
+
+  private void queryOrder(Long orderId) {
+    CoffeeOrder order = orderApi.getOrderUsingGET(orderId);
+    log.info("Coffee order: {}", order);
+  }
+
+  private void readMenuUsingRestTemplate() {
     ParameterizedTypeReference<List<Coffee>> ptr =
         new ParameterizedTypeReference<List<Coffee>>() {};
     ResponseEntity<List<Coffee>> responseEntity = restTemplate
@@ -45,7 +74,7 @@ public class CustomerRunner implements ApplicationRunner {
     responseEntity.getBody().forEach(cc -> log.info("Coffee: {}", cc));
   }
 
-  private long orderCoffee() {
+  private long orderCoffeeUsingRestTemplate() {
     OrderRequest orderRequest = OrderRequest
         .builder()
         .customer("Kevin Jin")
@@ -60,7 +89,7 @@ public class CustomerRunner implements ApplicationRunner {
     return response.getBody().getId();
   }
 
-  private void queryOrder(Long orderId) {
+  private void queryOrderUsingRestTemplate(Long orderId) {
     URI uri = UriComponentsBuilder
         .fromUriString("http://localhost:8080/order/{id}")
         .build(orderId);
