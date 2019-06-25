@@ -1,4 +1,4 @@
-package com.example.customerservice.support;
+package com.example.waiterservice.support;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

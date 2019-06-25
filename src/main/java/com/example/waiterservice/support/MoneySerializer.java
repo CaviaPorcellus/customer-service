@@ -1,4 +1,4 @@
-package com.example.customerservice.support;
+package com.example.waiterservice.support;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
