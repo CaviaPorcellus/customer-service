@@ -39,7 +39,7 @@ public class CustomerRunner implements ApplicationRunner {
   }
 
   private void showServiceInstances() {
-    discoveryClient.getInstances("waiter-service").forEach(
+    discoveryClient.getInstances("nacos-waiter-service").forEach(
         s -> log.info("Host: {}, Port: {}", s.getHost(), s.getPort()));
   }
 
@@ -47,7 +47,7 @@ public class CustomerRunner implements ApplicationRunner {
     ParameterizedTypeReference<List<Coffee>> ptr =
         new ParameterizedTypeReference<List<Coffee>>() {};
     ResponseEntity<List<Coffee>> responseEntity = restTemplate
-        .exchange("http://waiter-service/coffee/", HttpMethod.GET, null, ptr);
+        .exchange("http://nacos-waiter-service/coffee/", HttpMethod.GET, null, ptr);
     responseEntity.getBody().forEach(cc -> log.info("Coffee: {}", cc));
   }
 
@@ -58,7 +58,7 @@ public class CustomerRunner implements ApplicationRunner {
         .coffeeNames(Arrays.asList("latte", "mocha"))
         .build();
     RequestEntity<OrderRequest> request = RequestEntity
-        .post(UriComponentsBuilder.fromUriString("http://waiter-service/order/").build(new HashMap<>()))
+        .post(UriComponentsBuilder.fromUriString("http://nacos-waiter-service/order/").build(new HashMap<>()))
         .body(orderRequest);
     ResponseEntity<CoffeeOrder> response = restTemplate.exchange(request, CoffeeOrder.class);
     log.info("Response status: {}", response.getStatusCode());
@@ -68,7 +68,7 @@ public class CustomerRunner implements ApplicationRunner {
 
   private void queryOrder(Long orderId) {
     URI uri = UriComponentsBuilder
-        .fromUriString("http://waiter-service/order/{id}")
+        .fromUriString("http://nacos-waiter-service/order/{id}")
         .build(orderId);
     CoffeeOrder order = restTemplate.getForObject(uri, CoffeeOrder.class);
     log.info("Coffee order: {}", order);
