@@ -1,4 +1,4 @@
-package com.example.waiterservice;
+package com.example.customerservice;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

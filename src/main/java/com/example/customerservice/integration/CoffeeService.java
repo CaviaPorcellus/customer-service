@@ -1,6 +1,6 @@
-package com.example.waiterservice.integration;
+package com.example.customerservice.integration;
 
-import com.example.waiterservice.model.Coffee;
+import com.example.customerservice.model.Coffee;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

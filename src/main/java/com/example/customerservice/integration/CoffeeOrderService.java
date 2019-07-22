@@ -1,7 +1,7 @@
-package com.example.waiterservice.integration;
+package com.example.customerservice.integration;
 
-import com.example.waiterservice.model.CoffeeOrder;
-import com.example.waiterservice.model.OrderRequest;
+import com.example.customerservice.model.CoffeeOrder;
+import com.example.customerservice.model.OrderRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
