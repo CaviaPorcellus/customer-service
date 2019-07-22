@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "waiter-service", contextId = "coffeeOrder", path = "/order")
+@FeignClient(name = "waiter-service", contextId = "coffeeOrder", path = "/order",
+    fallback = FallbackCoffeeOrderService.class)
 public interface CoffeeOrderService {
 
   @GetMapping(path = "/{id}")

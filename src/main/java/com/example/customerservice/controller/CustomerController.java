@@ -5,6 +5,7 @@ import com.example.customerservice.integration.CoffeeService;
 import com.example.customerservice.model.Coffee;
 import com.example.customerservice.model.CoffeeOrder;
 import com.example.customerservice.model.OrderRequest;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ public class CustomerController {
   private CoffeeOrderService orderService;
 
   @GetMapping(path = "/menu")
+  @HystrixCommand(fallbackMethod = "readMenuFallBack")
   public List<Coffee> readMenu() {
     return coffeeService.getAll();
   }
@@ -38,5 +40,10 @@ public class CustomerController {
         .coffeeNames(Arrays.asList("latte", "mocha"))
         .build();
     return orderService.createOrder(orderRequest);
+  }
+
+  public List<Coffee> readMenuFallBack() {
+    log.info("Fall back to return empty menu");
+    return null;
   }
 }
