@@ -1,4 +1,4 @@
-package com.example.waiterservice.model;
+package com.example.customerservice.model;
 
 import lombok.Builder;
 import lombok.Getter;

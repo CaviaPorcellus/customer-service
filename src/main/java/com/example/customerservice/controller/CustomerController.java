@@ -1,10 +1,10 @@
-package com.example.waiterservice.controller;
+package com.example.customerservice.controller;
 
-import com.example.waiterservice.integration.CoffeeOrderService;
-import com.example.waiterservice.integration.CoffeeService;
-import com.example.waiterservice.model.Coffee;
-import com.example.waiterservice.model.CoffeeOrder;
-import com.example.waiterservice.model.OrderRequest;
+import com.example.customerservice.integration.CoffeeOrderService;
+import com.example.customerservice.integration.CoffeeService;
+import com.example.customerservice.model.Coffee;
+import com.example.customerservice.model.CoffeeOrder;
+import com.example.customerservice.model.OrderRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

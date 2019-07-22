@@ -1,4 +1,4 @@
-package com.example.waiterservice.support;
+package com.example.customerservice.support;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -21,7 +21,7 @@ public class CircuitBreakerAspect {
   private Map<String, AtomicInteger> failCounter = new ConcurrentHashMap<>();
   private Map<String, AtomicInteger> breakerCounter = new ConcurrentHashMap<>();
 
-  @Around("execution(* com.example.waiterservice.integration..*(..))")
+  @Around("execution(* com.example.customerservice.integration..*(..))")
   public Object doWithCircuitBreaker(ProceedingJoinPoint pjp) throws Throwable {
     String sig = pjp.getSignature().getName();
 
