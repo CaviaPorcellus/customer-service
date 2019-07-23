@@ -5,6 +5,9 @@ import com.example.customerservice.integration.CoffeeService;
 import com.example.customerservice.model.Coffee;
 import com.example.customerservice.model.CoffeeOrder;
 import com.example.customerservice.model.OrderRequest;
+import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -31,21 +34,26 @@ public class CustomerController {
   private CoffeeOrderService orderService;
 
   private CircuitBreaker circuitBreaker;
+  private Bulkhead bulkhead;
 
-  public CustomerController(CircuitBreakerRegistry registry) {
-    this.circuitBreaker = registry.circuitBreaker("menu");
+  public CustomerController(CircuitBreakerRegistry circuitBreakerRegistry, BulkheadRegistry bulkheadRegistry) {
+    this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("menu");
+    this.bulkhead = bulkheadRegistry.bulkhead("menu");
   }
 
   @GetMapping(path = "/menu")
   public List<Coffee> readMenu() {
     return Try
-        .ofSupplier(CircuitBreaker.decorateSupplier(circuitBreaker, () -> coffeeService.getAll()))
+        .ofSupplier(Bulkhead.decorateSupplier(bulkhead,
+            CircuitBreaker.decorateSupplier(circuitBreaker, () -> coffeeService.getAll())))
         .recover(CircuitBreakerOpenException.class, Collections.emptyList())
+        .recover(BulkheadFullException.class, Collections.emptyList())
         .get();
   }
 
-  @PostMapping(path = "/order")
+  @GetMapping(path = "/order")
   @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "order")
+  @io.github.resilience4j.bulkhead.annotation.Bulkhead(name = "order")
   public CoffeeOrder orderCoffee() {
     OrderRequest orderRequest = OrderRequest
         .builder()
