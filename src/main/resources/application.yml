@@ -27,10 +27,12 @@ management:
       show-details: always
 
 server:
+#  port: 8090
   port: 0
 
 customer:
   name: spring-${server.port}
+#  name: kevin
 
 #feign:
 #  client:

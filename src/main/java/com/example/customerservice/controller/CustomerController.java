@@ -16,6 +16,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,8 @@ public class CustomerController {
   private CoffeeOrderService orderService;
   private CircuitBreaker circuitBreaker;
   private Bulkhead bulkhead;
+  @Value("${customer.name}")
+  private String customer;
 
   public CustomerController(CircuitBreakerRegistry circuitBreakerRegistry, BulkheadRegistry bulkheadRegistry) {
     this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("menu");
@@ -58,7 +61,7 @@ public class CustomerController {
   public CoffeeOrder createAndPayOrder() {
     OrderRequest orderRequest = OrderRequest
         .builder()
-        .customer("Kevin Jin")
+        .customer(customer)
         .coffeeNames(Arrays.asList("latte", "mocha"))
         .build();
     CoffeeOrder order = orderService.createOrder(orderRequest);
