@@ -21,6 +21,6 @@ public interface CoffeeOrderService {
   CoffeeOrder createOrder(@RequestBody OrderRequest orderRequest);
 
   @PutMapping("/{id}")
-  CoffeeOrder updateOrder(@PathVariable("id") Long id, @RequestBody OrderStateRequest orderState);
+  CoffeeOrder updateState(@PathVariable("id") Long id, @RequestBody OrderStateRequest orderState);
 
 }

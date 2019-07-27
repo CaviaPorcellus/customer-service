@@ -5,6 +5,14 @@ spring:
       port: 8500
       discovery:
         prefer-ip-address: true
+    stream:
+      kafka:
+        binder:
+          brokers: localhost
+          defaultBrokerPort: 9092
+      bindings:
+        notifyOrders:
+          group: customer-service
   output:
     ansi:
       enabled: ALWAYS
@@ -19,7 +27,10 @@ management:
       show-details: always
 
 server:
-  port: 8090
+  port: 0
+
+customer:
+  name: spring-${server.port}
 
 #feign:
 #  client:
