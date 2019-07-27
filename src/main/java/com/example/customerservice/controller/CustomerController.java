@@ -5,6 +5,9 @@ import com.example.customerservice.integration.CoffeeService;
 import com.example.customerservice.model.Coffee;
 import com.example.customerservice.model.CoffeeOrder;
 import com.example.customerservice.model.OrderRequest;
+import com.example.customerservice.model.OrderState;
+import com.example.customerservice.model.OrderStateRequest;
+import com.example.customerservice.support.OrderWaitingEvent;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
@@ -14,6 +17,8 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,15 +31,15 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(path = "/customer")
-public class CustomerController {
+public class CustomerController implements ApplicationEventPublisherAware {
 
   @Autowired
   private CoffeeService coffeeService;
   @Autowired
   private CoffeeOrderService orderService;
-
   private CircuitBreaker circuitBreaker;
   private Bulkhead bulkhead;
+  private ApplicationEventPublisher applicationEventPublisher;
 
   public CustomerController(CircuitBreakerRegistry circuitBreakerRegistry, BulkheadRegistry bulkheadRegistry) {
     this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("menu");
@@ -54,12 +59,27 @@ public class CustomerController {
   @PostMapping(path = "/order")
   @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "order")
   @io.github.resilience4j.bulkhead.annotation.Bulkhead(name = "order")
-  public CoffeeOrder orderCoffee() {
+  public CoffeeOrder createAndPayOrder() {
     OrderRequest orderRequest = OrderRequest
         .builder()
         .customer("Kevin Jin")
         .coffeeNames(Arrays.asList("latte", "mocha"))
         .build();
-    return orderService.createOrder(orderRequest);
+    CoffeeOrder order = orderService.createOrder(orderRequest);
+    log.info("Create order: {}", order != null ? order.getId() : "-");
+
+    // make payments
+    order = orderService.updateOrder(order.getId(),
+        OrderStateRequest.builder().state(OrderState.PAID).build());
+    log.info("Order is PAID: {}", order);
+
+    applicationEventPublisher.publishEvent(new OrderWaitingEvent(order));
+
+    return order;
+  }
+
+  @Override
+  public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+    this.applicationEventPublisher = applicationEventPublisher;
   }
 }

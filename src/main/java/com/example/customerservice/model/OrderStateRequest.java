@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder
 @ToString
-public class OrderRequest {
+public class OrderStateRequest {
 
-  private String customer;
+  private OrderState state;
 
-  private List<String> coffeeNames;
 }
